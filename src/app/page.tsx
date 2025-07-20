@@ -114,8 +114,8 @@ function BreakpointBandit() {
     setTimeout(() => {
       setIsCapturing(false);
       toast({
-        title: "Đã chụp và lưu thành công!",
-        description: "Ảnh đã được tự động sao chép vào clipboard.",
+        title: "Capture Successful!",
+        description: "Screenshot copied to clipboard.",
       });
     }, 2000);
   };
