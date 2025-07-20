@@ -120,16 +120,17 @@ function BreakpointBandit() {
     cardElement.style.display = 'none';
 
     try {
-      // Allow a brief moment for the UI to update
-      await new Promise(resolve => setTimeout(resolve, 50));
+      // Allow a brief moment for the UI to update before capturing
+      await new Promise(resolve => setTimeout(resolve, 100));
 
       const canvas = await html2canvas(document.body, {
-        width: window.innerWidth,
-        height: window.document.body.scrollHeight,
-        windowWidth: window.innerWidth,
-        windowHeight: window.document.body.scrollHeight,
+        width: document.body.scrollWidth,
+        height: document.body.scrollHeight,
+        windowWidth: document.body.scrollWidth,
+        windowHeight: document.body.scrollHeight,
         y: 0,
-        scrollY: -window.scrollY
+        scrollY: -window.scrollY,
+        useCORS: true,
       });
       const dataUrl = canvas.toDataURL('image/png');
       setScreenshot(dataUrl);
@@ -607,7 +608,7 @@ export default function Home() {
                <AccordionItem value="item-4">
                 <AccordionTrigger>How does billing work?</AccordionTrigger>
                 <AccordionContent>
-                  You will be billed monthly or annually, depending on your choice. We accept all major credit cards. For Enterprise plans, we also support invoicing.
+                  You will now be billed monthly or annually, depending on your choice. We accept all major credit cards. For Enterprise plans, we also support invoicing.
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
@@ -623,3 +624,5 @@ export default function Home() {
     </div>
   );
 }
+
+    
