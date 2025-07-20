@@ -123,15 +123,15 @@ function BreakpointBandit() {
       // Allow a brief moment for the UI to update before capturing
       await new Promise(resolve => setTimeout(resolve, 100));
 
-      const canvas = await html2canvas(document.body, {
-        width: document.body.scrollWidth,
-        height: document.body.scrollHeight,
-        windowWidth: document.body.scrollWidth,
-        windowHeight: document.body.scrollHeight,
-        y: 0,
-        scrollY: -window.scrollY,
-        useCORS: true,
-      });
+      const canvas = await html2canvas(document.documentElement, {
+          height: document.documentElement.scrollHeight,
+          width: document.documentElement.scrollWidth,
+          windowHeight: document.documentElement.scrollHeight,
+          windowWidth: document.documentElement.scrollWidth,
+          scrollY: -window.scrollY,
+          useCORS: true,
+        });
+
       const dataUrl = canvas.toDataURL('image/png');
       setScreenshot(dataUrl);
 
