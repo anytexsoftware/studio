@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
@@ -13,7 +14,11 @@ import {
   Move,
   Code,
   Brush,
-  Zap
+  Zap,
+  Users,
+  Shield,
+  BarChart,
+  Star
 } from 'lucide-react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -32,6 +37,9 @@ import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+
 
 type StorageOption = 'local' | 'drive';
 
@@ -52,6 +60,10 @@ function BreakpointBandit() {
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
+    // Only allow dragging from the drag handle area
+    const handle = (e.target as HTMLElement).closest('[data-drag-handle]');
+    if (!handle) return;
+
     setIsDragging(true);
     if (cardRef.current) {
       const rect = cardRef.current.getBoundingClientRect();
@@ -177,9 +189,10 @@ function BreakpointBandit() {
         left: `${position.x}px`,
         touchAction: 'none',
       }}
+      onMouseDown={handleMouseDown}
     >
       <Card className="w-full shadow-2xl">
-        <div onMouseDown={handleMouseDown} className="cursor-move p-2 flex items-center justify-center text-muted-foreground">
+        <div data-drag-handle className="cursor-move p-2 flex items-center justify-center text-muted-foreground">
             <Move className="h-4 w-4" />
         </div>
         <Separator />
@@ -366,6 +379,192 @@ export default function Home() {
             />
           </div>
         </section>
+
+        <section className="mt-24 bg-white py-20">
+          <div className="container mx-auto px-6 text-center">
+            <h2 className="text-4xl font-bold text-gray-900">Why QuantumLeap?</h2>
+            <p className="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
+              We provide the best-in-class features to get you up and running in no time.
+            </p>
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-10 mt-12">
+              <div className="p-6">
+                <Users className="h-12 w-12 text-primary mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-gray-900">Team Collaboration</h3>
+                <p className="mt-2 text-gray-600">Work together with your team in a shared, collaborative environment.</p>
+              </div>
+              <div className="p-6">
+                <Shield className="h-12 w-12 text-primary mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-gray-900">Top-Notch Security</h3>
+                <p className="mt-2 text-gray-600">Your data is safe with us. We use enterprise-grade security measures.</p>
+              </div>
+              <div className="p-6">
+                <BarChart className="h-12 w-12 text-primary mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-gray-900">Advanced Analytics</h3>
+                <p className="mt-2 text-gray-600">Gain insights into your application's performance and usage.</p>
+              </div>
+              <div className="p-6">
+                <Code className="h-12 w-12 text-primary mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-gray-900">Extensible APIs</h3>
+                <p className="mt-2 text-gray-600">Build custom integrations with our flexible and powerful APIs.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="mt-24">
+          <div className="text-center">
+            <h2 className="text-4xl font-bold text-gray-900">Loved by Developers Worldwide</h2>
+            <p className="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
+              Don't just take our word for it. Here's what people are saying about QuantumLeap.
+            </p>
+          </div>
+          <div className="grid lg:grid-cols-3 gap-10 mt-12">
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center mb-4">
+                  <Avatar>
+                    <AvatarImage src="https://placehold.co/40x40.png" data-ai-hint="person" />
+                    <AvatarFallback>JD</AvatarFallback>
+                  </Avatar>
+                  <div className="ml-4">
+                    <p className="font-bold">Jane Doe</p>
+                    <p className="text-sm text-gray-500">Lead Developer, TechCorp</p>
+                  </div>
+                </div>
+                <p className="text-gray-600">"QuantumLeap has revolutionized our development process. We're shipping features faster than ever before."</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center mb-4">
+                  <Avatar>
+                    <AvatarImage src="https://placehold.co/40x40.png" data-ai-hint="person" />
+                    <AvatarFallback>JS</AvatarFallback>
+                  </Avatar>
+                  <div className="ml-4">
+                    <p className="font-bold">John Smith</p>
+                    <p className="text-sm text-gray-500">Founder, StartupX</p>
+                  </div>
+                </div>
+                <p className="text-gray-600">"The best platform for getting a project off the ground. The support is incredible and the features are top-tier."</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center mb-4">
+                  <Avatar>
+                    <AvatarImage src="https://placehold.co/40x40.png" data-ai-hint="person" />
+                    <AvatarFallback>SC</AvatarFallback>
+                  </Avatar>
+                  <div className="ml-4">
+                    <p className="font-bold">Sarah Chen</p>
+                    <p className="text-sm text-gray-500">CTO, Innovate LLC</p>
+                  </div>
+                </div>
+                <p className="text-gray-600">"An indispensable tool for any modern development team. Highly recommended for its performance and ease of use."</p>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+        
+        <section className="mt-24">
+          <div className="text-center">
+            <h2 className="text-4xl font-bold text-gray-900">Choose Your Plan</h2>
+            <p className="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">Simple, transparent pricing for teams of all sizes.</p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-8 mt-12 max-w-5xl mx-auto">
+            <Card className="flex flex-col">
+              <CardHeader>
+                <CardTitle className="text-2xl text-center">Starter</CardTitle>
+                <CardDescription className="text-center">For individuals and hobby projects.</CardDescription>
+              </CardHeader>
+              <CardContent className="flex-grow space-y-4">
+                 <p className="text-4xl font-bold text-center">$0<span className="text-lg font-normal text-gray-500">/mo</span></p>
+                 <ul className="space-y-2 text-gray-600">
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-2"/>1 Project</li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-2"/>1 User</li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-2"/>Community Support</li>
+                 </ul>
+              </CardContent>
+              <CardFooter>
+                  <Button variant="outline" className="w-full">Get Started</Button>
+              </CardFooter>
+            </Card>
+            <Card className="border-primary flex flex-col shadow-2xl">
+               <CardHeader>
+                <CardTitle className="text-2xl text-center">Pro</CardTitle>
+                <CardDescription className="text-center">For professional developers and teams.</CardDescription>
+              </CardHeader>
+              <CardContent className="flex-grow space-y-4">
+                 <p className="text-4xl font-bold text-center">$49<span className="text-lg font-normal text-gray-500">/mo</span></p>
+                 <ul className="space-y-2 text-gray-600">
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-2"/>Unlimited Projects</li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-2"/>Up to 10 Users</li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-2"/>Priority Email Support</li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-2"/>Advanced Analytics</li>
+                 </ul>
+              </CardContent>
+              <CardFooter>
+                  <Button className="w-full">Choose Pro</Button>
+              </CardFooter>
+            </Card>
+            <Card className="flex flex-col">
+              <CardHeader>
+                <CardTitle className="text-2xl text-center">Enterprise</CardTitle>
+                <CardDescription className="text-center">For large-scale applications.</CardDescription>
+              </CardHeader>
+              <CardContent className="flex-grow space-y-4">
+                 <p className="text-4xl font-bold text-center">Custom</p>
+                 <ul className="space-y-2 text-gray-600">
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-2"/>Unlimited Everything</li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-2"/>Dedicated Support & Onboarding</li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-2"/>SAML/SSO Integration</li>
+                    <li className="flex items-center"><CheckCircle className="h-5 w-5 text-green-500 mr-2"/>Custom SLAs</li>
+                 </ul>
+              </CardContent>
+              <CardFooter>
+                  <Button variant="outline" className="w-full">Contact Sales</Button>
+              </CardFooter>
+            </Card>
+          </div>
+        </section>
+
+        <section className="mt-24">
+           <div className="text-center">
+            <h2 className="text-4xl font-bold text-gray-900">Frequently Asked Questions</h2>
+            <p className="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
+              Have questions? We have answers. If you can't find what you're looking for, feel free to contact us.
+            </p>
+          </div>
+          <div className="max-w-3xl mx-auto mt-12">
+            <Accordion type="single" collapsible className="w-full">
+              <AccordionItem value="item-1">
+                <AccordionTrigger>Is there a free trial?</AccordionTrigger>
+                <AccordionContent>
+                  Yes! You can use the Starter plan for free for as long as you like. If you want to try the Pro features, we offer a 14-day free trial, no credit card required.
+                </AccordionContent>
+              </AccordionItem>
+              <AccordionItem value="item-2">
+                <AccordionTrigger>Can I change my plan later?</AccordionTrigger>
+                <AccordionContent>
+                  Absolutely. You can upgrade or downgrade your plan at any time from your account dashboard. The changes will be prorated.
+                </AccordionContent>
+              </AccordionItem>
+              <AccordionItem value="item-3">
+                <AccordionTrigger>What is your refund policy?</AccordionTrigger>
+                <AccordionContent>
+                  We offer a 30-day money-back guarantee on all our paid plans. If you're not satisfied for any reason, just let us know and we'll process a full refund.
+                </AccordionContent>
+              </AccordionItem>
+               <AccordionItem value="item-4">
+                <AccordionTrigger>How does billing work?</AccordionTrigger>
+                <AccordionContent>
+                  You will be billed monthly or annually, depending on your choice. We accept all major credit cards. For Enterprise plans, we also support invoicing.
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          </div>
+        </section>
       </main>
 
       <footer className="bg-white mt-20 border-t">
@@ -376,5 +575,3 @@ export default function Home() {
     </div>
   );
 }
-
-    
