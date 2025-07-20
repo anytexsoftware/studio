@@ -40,6 +40,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import html2canvas from 'html2canvas';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 
 type StorageOption = 'local' | 'drive';
@@ -156,6 +157,21 @@ function BreakpointBandit() {
     }
   };
 
+  const handleDownload = () => {
+    if (!screenshot) return;
+    const link = document.createElement('a');
+    link.href = screenshot;
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    link.download = `screenshot-${timestamp}.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast({
+      title: 'Download Started',
+      description: 'Your screenshot is being downloaded.',
+    });
+  };
+
   const handleConnectDrive = () => {
     setIsConnecting(true);
     setTimeout(() => {
@@ -228,12 +244,12 @@ function BreakpointBandit() {
       }}
       onMouseDown={handleMouseDown}
     >
-      <Card className="w-full shadow-2xl">
-        <div data-drag-handle className="cursor-move p-2 flex items-center justify-center text-muted-foreground">
+      <Card className="w-full shadow-2xl flex flex-col max-h-[90vh]">
+        <div data-drag-handle className="cursor-move p-2 flex items-center justify-center text-muted-foreground flex-shrink-0">
             <Move className="h-4 w-4" />
         </div>
-        <Separator />
-        <CardHeader className="text-center relative pt-4">
+        <Separator className="flex-shrink-0"/>
+        <CardHeader className="text-center relative pt-4 flex-shrink-0">
           <Button
             variant="ghost"
             size="icon"
@@ -248,92 +264,102 @@ function BreakpointBandit() {
           <CardTitle className="text-3xl font-headline">Breakpoint Bandit</CardTitle>
           <CardDescription>Advanced Screenshot Tool</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="space-y-4">
-            <Button 
-              onClick={handleCapture} 
-              disabled={isCapturing} 
-              className="w-full text-lg py-6"
-              size="lg"
-            >
-              {isCapturing ? (
-                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-              ) : (
-                <Camera className="mr-2 h-5 w-5" />
-              )}
-              {isCapturing ? 'Capturing...' : `Capture at ${breakpoint}px`}
-            </Button>
-            {screenshot && (
-              <div className="mt-4 border rounded-lg p-2 bg-muted">
-                <p className="text-sm font-medium text-center mb-2">Last Capture:</p>
-                <Image
-                  src={screenshot}
-                  alt="Screenshot"
-                  width={300}
-                  height={150}
-                  className="rounded-md object-contain w-full"
-                />
-              </div>
-            )}
-          </div>
-          
-          <Separator />
-
-          <div className="space-y-4">
-            <h3 className="flex items-center gap-2 text-lg font-semibold text-foreground">
-              <Settings className="h-5 w-5" />
-              Settings
-            </h3>
-            
-            <div className="space-y-2">
-              <Label htmlFor="breakpoint">Breakpoint Width</Label>
-              <div className="flex items-center">
-                <Input
-                  id="breakpoint"
-                  type="number"
-                  value={breakpoint}
-                  onChange={(e) => setBreakpoint(e.target.value)}
-                  placeholder="e.g., 1440"
-                  className="rounded-r-none"
-                />
-                <span className="inline-flex items-center px-3 rounded-r-md border border-l-0 border-input bg-secondary text-secondary-foreground text-sm">
-                  px
-                </span>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Default Storage</Label>
-              <RadioGroup
-                value={storageOption}
-                onValueChange={(value) => setStorageOption(value as StorageOption)}
-                className="grid grid-cols-1 sm:grid-cols-2 gap-2"
+        <ScrollArea className="flex-grow overflow-y-auto">
+          <CardContent className="space-y-6">
+            <div className="space-y-4">
+              <Button 
+                onClick={handleCapture} 
+                disabled={isCapturing} 
+                className="w-full text-lg py-6"
+                size="lg"
               >
-                <Label htmlFor="r1" className="flex flex-col items-start space-y-1 rounded-md border p-4 cursor-pointer hover:bg-accent/50 has-[input:checked]:bg-accent has-[input:checked]:text-accent-foreground has-[input:checked]:border-accent-foreground/50 transition-colors">
-                  <div className="flex items-center gap-2">
-                    <RadioGroupItem value="local" id="r1" />
-                    <Download className="h-4 w-4" />
-                    <span>Save to Device</span>
+                {isCapturing ? (
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                ) : (
+                  <Camera className="mr-2 h-5 w-5" />
+                )}
+                {isCapturing ? 'Capturing...' : `Capture at ${breakpoint}px`}
+              </Button>
+              {screenshot && (
+                <div className="mt-4 border rounded-lg p-2 bg-muted space-y-2">
+                  <div className="flex justify-between items-center">
+                    <p className="text-sm font-medium text-center">Last Capture:</p>
+                    <Button variant="outline" size="sm" onClick={handleDownload}>
+                      <Download className="mr-2 h-4 w-4" />
+                      Download
+                    </Button>
                   </div>
-                </Label>
-                <Label htmlFor="r2" className="flex flex-col items-start space-y-1 rounded-md border p-4 cursor-pointer hover:bg-accent/50 has-[input:checked]:bg-accent has-[input:checked]:text-accent-foreground has-[input:checked]:border-accent-foreground/50 transition-colors">
-                  <div className="flex items-center gap-2">
-                    <RadioGroupItem value="drive" id="r2" />
-                    <UploadCloud className="h-4 w-4" />
-                    <span>Google Drive</span>
-                  </div>
-                </Label>
-              </RadioGroup>
+                  <ScrollArea className="h-60 w-full rounded-md border">
+                    <Image
+                      src={screenshot}
+                      alt="Screenshot"
+                      width={400}
+                      height={800}
+                      className="rounded-md object-contain w-full"
+                    />
+                  </ScrollArea>
+                </div>
+              )}
             </div>
             
-            {storageOption === 'drive' && (
-              <div className="flex justify-center pt-2">
-                {driveButton}
+            <Separator />
+
+            <div className="space-y-4">
+              <h3 className="flex items-center gap-2 text-lg font-semibold text-foreground">
+                <Settings className="h-5 w-5" />
+                Settings
+              </h3>
+              
+              <div className="space-y-2">
+                <Label htmlFor="breakpoint">Breakpoint Width</Label>
+                <div className="flex items-center">
+                  <Input
+                    id="breakpoint"
+                    type="number"
+                    value={breakpoint}
+                    onChange={(e) => setBreakpoint(e.target.value)}
+                    placeholder="e.g., 1440"
+                    className="rounded-r-none"
+                  />
+                  <span className="inline-flex items-center px-3 rounded-r-md border border-l-0 border-input bg-secondary text-secondary-foreground text-sm">
+                    px
+                  </span>
+                </div>
               </div>
-            )}
-          </div>
-        </CardContent>
-        <CardFooter>
+
+              <div className="space-y-2">
+                <Label>Default Storage</Label>
+                <RadioGroup
+                  value={storageOption}
+                  onValueChange={(value) => setStorageOption(value as StorageOption)}
+                  className="grid grid-cols-1 sm:grid-cols-2 gap-2"
+                >
+                  <Label htmlFor="r1" className="flex flex-col items-start space-y-1 rounded-md border p-4 cursor-pointer hover:bg-accent/50 has-[input:checked]:bg-accent has-[input:checked]:text-accent-foreground has-[input:checked]:border-accent-foreground/50 transition-colors">
+                    <div className="flex items-center gap-2">
+                      <RadioGroupItem value="local" id="r1" />
+                      <Download className="h-4 w-4" />
+                      <span>Save to Device</span>
+                    </div>
+                  </Label>
+                  <Label htmlFor="r2" className="flex flex-col items-start space-y-1 rounded-md border p-4 cursor-pointer hover:bg-accent/50 has-[input:checked]:bg-accent has-[input:checked]:text-accent-foreground has-[input:checked]:border-accent-foreground/50 transition-colors">
+                    <div className="flex items-center gap-2">
+                      <RadioGroupItem value="drive" id="r2" />
+                      <UploadCloud className="h-4 w-4" />
+                      <span>Google Drive</span>
+                    </div>
+                  </Label>
+                </RadioGroup>
+              </div>
+              
+              {storageOption === 'drive' && (
+                <div className="flex justify-center pt-2">
+                  {driveButton}
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </ScrollArea>
+        <CardFooter className="flex-shrink-0">
           <p className="text-xs text-muted-foreground flex items-center gap-1.5 mx-auto">
             <ClipboardCopy className="h-3 w-3" />
             Screenshots are automatically copied to clipboard.
@@ -625,4 +651,3 @@ export default function Home() {
   );
 }
 
-    
