@@ -131,10 +131,10 @@ function BreakpointBandit() {
       const options = {
           useCORS: true,
           ...(captureMode === 'full' ? {
-              height: document.documentElement.scrollHeight,
-              width: document.documentElement.scrollWidth,
-              windowHeight: document.documentElement.scrollHeight,
-              windowWidth: document.documentElement.scrollWidth,
+              height: document.body.scrollHeight,
+              width: document.body.scrollWidth,
+              windowHeight: document.body.scrollHeight,
+              windowWidth: document.body.scrollWidth,
               scrollY: -window.scrollY,
           } : {
               height: window.innerHeight,
@@ -144,7 +144,7 @@ function BreakpointBandit() {
           })
       };
 
-      const canvas = await html2canvas(document.documentElement, options);
+      const canvas = await html2canvas(document.body, options);
       
       const dataUrl = canvas.toDataURL('image/png');
       setScreenshot(dataUrl);
