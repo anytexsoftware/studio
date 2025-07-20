@@ -82,95 +82,97 @@ export default function Home() {
   }, [isDriveConnected, isConnecting, handleConnectDrive]);
 
   return (
-    <main className="flex min-h-screen w-full items-center justify-center bg-background p-4 sm:p-6 md:p-8">
-      <Card className="w-full max-w-md shadow-2xl">
-        <CardHeader className="text-center">
-          <div className="mx-auto bg-primary text-primary-foreground rounded-full p-3 w-fit mb-4">
-            <Camera className="h-8 w-8" />
-          </div>
-          <CardTitle className="text-3xl font-headline">Breakpoint Bandit</CardTitle>
-          <CardDescription>Advanced Screenshot Tool</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="space-y-4">
-            <Button 
-              onClick={handleCapture} 
-              disabled={isCapturing} 
-              className="w-full text-lg py-6"
-              size="lg"
-            >
-              {isCapturing ? (
-                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-              ) : (
-                <Camera className="mr-2 h-5 w-5" />
-              )}
-              {isCapturing ? 'Capturing...' : `Capture at ${breakpoint}px`}
-            </Button>
-          </div>
-          
-          <Separator />
-
-          <div className="space-y-4">
-            <h3 className="flex items-center gap-2 text-lg font-semibold text-foreground">
-              <Settings className="h-5 w-5" />
-              Settings
-            </h3>
-            
-            <div className="space-y-2">
-              <Label htmlFor="breakpoint">Breakpoint Width</Label>
-              <div className="flex items-center">
-                <Input
-                  id="breakpoint"
-                  type="number"
-                  value={breakpoint}
-                  onChange={(e) => setBreakpoint(e.target.value)}
-                  placeholder="e.g., 1440"
-                  className="rounded-r-none"
-                />
-                <span className="inline-flex items-center px-3 rounded-r-md border border-l-0 border-input bg-secondary text-secondary-foreground text-sm">
-                  px
-                </span>
-              </div>
+    <main className="w-full bg-transparent p-4 flex justify-end">
+      <div className="w-full max-w-sm">
+        <Card className="w-full shadow-2xl">
+          <CardHeader className="text-center">
+            <div className="mx-auto bg-primary text-primary-foreground rounded-full p-3 w-fit mb-4">
+              <Camera className="h-8 w-8" />
             </div>
-
-            <div className="space-y-2">
-              <Label>Default Storage</Label>
-              <RadioGroup
-                value={storageOption}
-                onValueChange={(value) => setStorageOption(value as StorageOption)}
-                className="grid grid-cols-1 sm:grid-cols-2 gap-2"
+            <CardTitle className="text-3xl font-headline">Breakpoint Bandit</CardTitle>
+            <CardDescription>Advanced Screenshot Tool</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="space-y-4">
+              <Button 
+                onClick={handleCapture} 
+                disabled={isCapturing} 
+                className="w-full text-lg py-6"
+                size="lg"
               >
-                <Label htmlFor="r1" className="flex flex-col items-start space-y-1 rounded-md border p-4 cursor-pointer hover:bg-accent/50 has-[input:checked]:bg-accent has-[input:checked]:text-accent-foreground has-[input:checked]:border-accent-foreground/50 transition-colors">
-                  <div className="flex items-center gap-2">
-                    <RadioGroupItem value="local" id="r1" />
-                    <Download className="h-4 w-4" />
-                    <span>Save to Device</span>
-                  </div>
-                </Label>
-                <Label htmlFor="r2" className="flex flex-col items-start space-y-1 rounded-md border p-4 cursor-pointer hover:bg-accent/50 has-[input:checked]:bg-accent has-[input:checked]:text-accent-foreground has-[input:checked]:border-accent-foreground/50 transition-colors">
-                  <div className="flex items-center gap-2">
-                    <RadioGroupItem value="drive" id="r2" />
-                    <UploadCloud className="h-4 w-4" />
-                    <span>Google Drive</span>
-                  </div>
-                </Label>
-              </RadioGroup>
+                {isCapturing ? (
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                ) : (
+                  <Camera className="mr-2 h-5 w-5" />
+                )}
+                {isCapturing ? 'Capturing...' : `Capture at ${breakpoint}px`}
+              </Button>
             </div>
             
-            {storageOption === 'drive' && (
-              <div className="flex justify-center pt-2">
-                {driveButton}
+            <Separator />
+
+            <div className="space-y-4">
+              <h3 className="flex items-center gap-2 text-lg font-semibold text-foreground">
+                <Settings className="h-5 w-5" />
+                Settings
+              </h3>
+              
+              <div className="space-y-2">
+                <Label htmlFor="breakpoint">Breakpoint Width</Label>
+                <div className="flex items-center">
+                  <Input
+                    id="breakpoint"
+                    type="number"
+                    value={breakpoint}
+                    onChange={(e) => setBreakpoint(e.target.value)}
+                    placeholder="e.g., 1440"
+                    className="rounded-r-none"
+                  />
+                  <span className="inline-flex items-center px-3 rounded-r-md border border-l-0 border-input bg-secondary text-secondary-foreground text-sm">
+                    px
+                  </span>
+                </div>
               </div>
-            )}
-          </div>
-        </CardContent>
-        <CardFooter>
-          <p className="text-xs text-muted-foreground flex items-center gap-1.5 mx-auto">
-            <ClipboardCopy className="h-3 w-3" />
-            Screenshots are automatically copied to clipboard.
-          </p>
-        </CardFooter>
-      </Card>
+
+              <div className="space-y-2">
+                <Label>Default Storage</Label>
+                <RadioGroup
+                  value={storageOption}
+                  onValueChange={(value) => setStorageOption(value as StorageOption)}
+                  className="grid grid-cols-1 sm:grid-cols-2 gap-2"
+                >
+                  <Label htmlFor="r1" className="flex flex-col items-start space-y-1 rounded-md border p-4 cursor-pointer hover:bg-accent/50 has-[input:checked]:bg-accent has-[input:checked]:text-accent-foreground has-[input:checked]:border-accent-foreground/50 transition-colors">
+                    <div className="flex items-center gap-2">
+                      <RadioGroupItem value="local" id="r1" />
+                      <Download className="h-4 w-4" />
+                      <span>Save to Device</span>
+                    </div>
+                  </Label>
+                  <Label htmlFor="r2" className="flex flex-col items-start space-y-1 rounded-md border p-4 cursor-pointer hover:bg-accent/50 has-[input:checked]:bg-accent has-[input:checked]:text-accent-foreground has-[input:checked]:border-accent-foreground/50 transition-colors">
+                    <div className="flex items-center gap-2">
+                      <RadioGroupItem value="drive" id="r2" />
+                      <UploadCloud className="h-4 w-4" />
+                      <span>Google Drive</span>
+                    </div>
+                  </Label>
+                </RadioGroup>
+              </div>
+              
+              {storageOption === 'drive' && (
+                <div className="flex justify-center pt-2">
+                  {driveButton}
+                </div>
+              )}
+            </div>
+          </CardContent>
+          <CardFooter>
+            <p className="text-xs text-muted-foreground flex items-center gap-1.5 mx-auto">
+              <ClipboardCopy className="h-3 w-3" />
+              Screenshots are automatically copied to clipboard.
+            </p>
+          </CardFooter>
+        </Card>
+      </div>
     </main>
   );
 }
