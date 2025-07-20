@@ -39,6 +39,7 @@ import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import html2canvas from 'html2canvas';
 
 
 type StorageOption = 'local' | 'drive';
@@ -50,6 +51,7 @@ function BreakpointBandit() {
   const [isCapturing, setIsCapturing] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [screenshot, setScreenshot] = useState<string | null>(null);
   
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
@@ -60,7 +62,6 @@ function BreakpointBandit() {
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
-    // Only allow dragging from the drag handle area
     const handle = (e.target as HTMLElement).closest('[data-drag-handle]');
     if (!handle) return;
 
@@ -109,15 +110,49 @@ function BreakpointBandit() {
   }, []);
 
 
-  const handleCapture = () => {
+  const handleCapture = async () => {
+    if (!cardRef.current) return;
     setIsCapturing(true);
-    setTimeout(() => {
-      setIsCapturing(false);
+
+    const cardElement = cardRef.current;
+    
+    // Hide the extension popup before taking the screenshot
+    cardElement.style.display = 'none';
+
+    try {
+      // Allow a brief moment for the UI to update
+      await new Promise(resolve => setTimeout(resolve, 50));
+
+      const canvas = await html2canvas(document.body, {
+        width: window.innerWidth,
+        height: window.document.body.scrollHeight,
+        windowWidth: window.innerWidth,
+        windowHeight: window.document.body.scrollHeight,
+        y: 0,
+        scrollY: -window.scrollY
+      });
+      const dataUrl = canvas.toDataURL('image/png');
+      setScreenshot(dataUrl);
+
+      navigator.clipboard.writeText(dataUrl);
+
       toast({
         title: "Capture Successful!",
         description: "Screenshot copied to clipboard.",
       });
-    }, 2000);
+
+    } catch (error) {
+      console.error("Failed to capture screenshot:", error);
+      toast({
+        variant: "destructive",
+        title: "Capture Failed",
+        description: "Could not take the screenshot.",
+      });
+    } finally {
+      // Always show the popup again
+      cardElement.style.display = 'block';
+      setIsCapturing(false);
+    }
   };
 
   const handleConnectDrive = () => {
@@ -183,6 +218,7 @@ function BreakpointBandit() {
   return (
     <div 
       ref={cardRef}
+      id="breakpoint-bandit-extension"
       className="w-full max-w-sm fixed z-50"
       style={{
         top: `${position.y}px`,
@@ -226,6 +262,18 @@ function BreakpointBandit() {
               )}
               {isCapturing ? 'Capturing...' : `Capture at ${breakpoint}px`}
             </Button>
+            {screenshot && (
+              <div className="mt-4 border rounded-lg p-2 bg-muted">
+                <p className="text-sm font-medium text-center mb-2">Last Capture:</p>
+                <Image
+                  src={screenshot}
+                  alt="Screenshot"
+                  width={300}
+                  height={150}
+                  className="rounded-md object-contain w-full"
+                />
+              </div>
+            )}
           </div>
           
           <Separator />
