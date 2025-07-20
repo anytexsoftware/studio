@@ -135,7 +135,8 @@ function BreakpointBandit() {
               width: document.body.scrollWidth,
               windowHeight: document.body.scrollHeight,
               windowWidth: document.body.scrollWidth,
-              scrollY: -window.scrollY,
+              scrollY: 0,
+              scrollX: 0
           } : {
               height: window.innerHeight,
               width: window.innerWidth,
@@ -687,3 +688,5 @@ export default function Home() {
     </div>
   );
 }
+
+    
