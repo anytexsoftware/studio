@@ -18,7 +18,9 @@ import {
   Users,
   Shield,
   BarChart,
-  Star
+  Star,
+  Maximize,
+  Minimize
 } from 'lucide-react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -44,10 +46,12 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 
 
 type StorageOption = 'local' | 'drive';
+type CaptureMode = 'full' | 'visible';
 
 function BreakpointBandit() {
   const [breakpoint, setBreakpoint] = useState('1440');
   const [storageOption, setStorageOption] = useState<StorageOption>('drive');
+  const [captureMode, setCaptureMode] = useState<CaptureMode>('full');
   const [isDriveConnected, setIsDriveConnected] = useState(false);
   const [isCapturing, setIsCapturing] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
@@ -124,15 +128,24 @@ function BreakpointBandit() {
       // Allow a brief moment for the UI to update before capturing
       await new Promise(resolve => setTimeout(resolve, 100));
 
-      const canvas = await html2canvas(document.documentElement, {
-          height: document.documentElement.scrollHeight,
-          width: document.documentElement.scrollWidth,
-          windowHeight: document.documentElement.scrollHeight,
-          windowWidth: document.documentElement.scrollWidth,
-          scrollY: -window.scrollY,
+      const options = {
           useCORS: true,
-        });
+          ...(captureMode === 'full' ? {
+              height: document.documentElement.scrollHeight,
+              width: document.documentElement.scrollWidth,
+              windowHeight: document.documentElement.scrollHeight,
+              windowWidth: document.documentElement.scrollWidth,
+              scrollY: -window.scrollY,
+          } : {
+              height: window.innerHeight,
+              width: window.innerWidth,
+              scrollY: -window.scrollY,
+              x: window.scrollX
+          })
+      };
 
+      const canvas = await html2canvas(document.documentElement, options);
+      
       const dataUrl = canvas.toDataURL('image/png');
       setScreenshot(dataUrl);
 
@@ -278,7 +291,7 @@ function BreakpointBandit() {
                 ) : (
                   <Camera className="mr-2 h-5 w-5" />
                 )}
-                {isCapturing ? 'Capturing...' : `Capture at ${breakpoint}px`}
+                {isCapturing ? 'Capturing...' : `Capture`}
               </Button>
               {screenshot && (
                 <div className="mt-4 border rounded-lg p-2 bg-muted space-y-2">
@@ -310,6 +323,30 @@ function BreakpointBandit() {
                 Settings
               </h3>
               
+              <div className="space-y-2">
+                <Label>Capture Mode</Label>
+                <RadioGroup
+                  value={captureMode}
+                  onValueChange={(value) => setCaptureMode(value as CaptureMode)}
+                  className="grid grid-cols-1 sm:grid-cols-2 gap-2"
+                >
+                  <Label htmlFor="r-full" className="flex flex-col items-start space-y-1 rounded-md border p-4 cursor-pointer hover:bg-accent/50 has-[input:checked]:bg-accent has-[input:checked]:text-accent-foreground has-[input:checked]:border-accent-foreground/50 transition-colors">
+                    <div className="flex items-center gap-2">
+                      <RadioGroupItem value="full" id="r-full" />
+                      <Maximize className="h-4 w-4" />
+                      <span>Full Page</span>
+                    </div>
+                  </Label>
+                  <Label htmlFor="r-visible" className="flex flex-col items-start space-y-1 rounded-md border p-4 cursor-pointer hover:bg-accent/50 has-[input:checked]:bg-accent has-[input:checked]:text-accent-foreground has-[input:checked]:border-accent-foreground/50 transition-colors">
+                    <div className="flex items-center gap-2">
+                      <RadioGroupItem value="visible" id="r-visible" />
+                      <Minimize className="h-4 w-4" />
+                      <span>Visible Area</span>
+                    </div>
+                  </Label>
+                </RadioGroup>
+              </div>
+
               <div className="space-y-2">
                 <Label htmlFor="breakpoint">Breakpoint Width</Label>
                 <div className="flex items-center">
@@ -650,4 +687,3 @@ export default function Home() {
     </div>
   );
 }
-
