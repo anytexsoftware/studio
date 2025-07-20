@@ -8,7 +8,8 @@ import {
   UploadCloud, 
   ClipboardCopy, 
   CheckCircle,
-  Loader2
+  Loader2,
+  ChevronsRightLeft
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -24,6 +25,8 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
+import { cn } from '@/lib/utils';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 type StorageOption = 'local' | 'drive';
 
@@ -33,6 +36,7 @@ export default function Home() {
   const [isDriveConnected, setIsDriveConnected] = useState(false);
   const [isCapturing, setIsCapturing] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const { toast } = useToast();
 
   const handleCapture = () => {
@@ -79,13 +83,45 @@ export default function Home() {
         {isConnecting ? 'Connecting...' : 'Connect to Google Drive'}
       </Button>
     );
-  }, [isDriveConnected, isConnecting, handleConnectDrive]);
+  }, [isDriveConnected, isConnecting]);
+
+  if (isCollapsed) {
+    return (
+      <main className="w-full bg-transparent p-4 flex justify-end">
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="default"
+                size="icon"
+                className="rounded-full h-14 w-14 shadow-2xl"
+                onClick={() => setIsCollapsed(false)}
+              >
+                <Camera className="h-7 w-7" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Show Breakpoint Bandit</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </main>
+    );
+  }
 
   return (
     <main className="w-full bg-transparent p-4 flex justify-end">
       <div className="w-full max-w-sm">
         <Card className="w-full shadow-2xl">
-          <CardHeader className="text-center">
+          <CardHeader className="text-center relative">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute top-2 right-2 text-muted-foreground"
+              onClick={() => setIsCollapsed(true)}
+            >
+              <ChevronsRightLeft className="h-5 w-5" />
+            </Button>
             <div className="mx-auto bg-primary text-primary-foreground rounded-full p-3 w-fit mb-4">
               <Camera className="h-8 w-8" />
             </div>
