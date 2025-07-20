@@ -140,8 +140,10 @@ function BreakpointBandit() {
           } : {
               height: window.innerHeight,
               width: window.innerWidth,
-              scrollY: -window.scrollY,
-              x: window.scrollX
+              scrollY: window.scrollY,
+              scrollX: window.scrollX,
+              windowHeight: window.innerHeight,
+              windowWidth: window.innerWidth,
           })
       };
 
@@ -688,5 +690,7 @@ export default function Home() {
     </div>
   );
 }
+
+    
 
     
