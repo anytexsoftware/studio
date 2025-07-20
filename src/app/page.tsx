@@ -43,6 +43,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import html2canvas from 'html2canvas';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { useSearchParams } from 'next/navigation';
 
 
 type StorageOption = 'local' | 'drive';
@@ -62,6 +63,8 @@ function BreakpointBandit() {
   const [isDragging, setIsDragging] = useState(false);
   const dragStartPos = useRef({ x: 0, y: 0 });
   const cardRef = useRef<HTMLDivElement>(null);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+
 
   const { toast } = useToast();
 
@@ -116,38 +119,35 @@ function BreakpointBandit() {
 
 
   const handleCapture = async () => {
-    if (!cardRef.current) return;
+    const iframe = iframeRef.current;
+    if (!iframe || !iframe.contentWindow) return;
     setIsCapturing(true);
 
-    const cardElement = cardRef.current;
-    
-    // Hide the extension popup before taking the screenshot
-    cardElement.style.display = 'none';
-
     try {
-      // Allow a brief moment for the UI to update before capturing
-      await new Promise(resolve => setTimeout(resolve, 100));
+      const targetDocument = iframe.contentWindow.document;
+      const targetBody = targetDocument.body;
 
       const options = {
-          useCORS: true,
-          ...(captureMode === 'full' ? {
-              height: document.body.scrollHeight,
-              width: document.body.scrollWidth,
-              windowHeight: document.body.scrollHeight,
-              windowWidth: document.body.scrollWidth,
-              scrollY: 0,
-              scrollX: 0
-          } : {
-              height: window.innerHeight,
-              width: window.innerWidth,
-              scrollY: window.scrollY,
-              scrollX: window.scrollX,
-              windowHeight: window.innerHeight,
-              windowWidth: window.innerWidth,
-          })
+        useCORS: true,
+        allowTaint: true,
+        ...(captureMode === 'full' ? {
+            height: targetBody.scrollHeight,
+            width: targetBody.scrollWidth,
+            windowHeight: targetBody.scrollHeight,
+            windowWidth: targetBody.scrollWidth,
+            scrollY: 0,
+            scrollX: 0
+        } : {
+            height: iframe.contentWindow.innerHeight,
+            width: iframe.contentWindow.innerWidth,
+            scrollY: -iframe.contentWindow.scrollY,
+            scrollX: -iframe.contentWindow.scrollX,
+            windowHeight: iframe.contentWindow.innerHeight,
+            windowWidth: iframe.contentWindow.innerWidth,
+        })
       };
-
-      const canvas = await html2canvas(document.body, options);
+      
+      const canvas = await html2canvas(targetBody, options);
       
       const dataUrl = canvas.toDataURL('image/png');
       setScreenshot(dataUrl);
@@ -167,8 +167,6 @@ function BreakpointBandit() {
         description: "Could not take the screenshot.",
       });
     } finally {
-      // Always show the popup again
-      cardElement.style.display = 'block';
       setIsCapturing(false);
     }
   };
@@ -221,34 +219,7 @@ function BreakpointBandit() {
     );
   }, [isDriveConnected, isConnecting]);
 
-  if (isCollapsed) {
-    return (
-      <div 
-        className="fixed z-50"
-        style={{ top: `${position.y}px`, left: `${position.x}px` }}
-      >
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="default"
-                size="icon"
-                className="rounded-full h-14 w-14 shadow-2xl"
-                onClick={() => setIsCollapsed(false)}
-              >
-                <Camera className="h-7 w-7" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Show Breakpoint Bandit</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      </div>
-    );
-  }
-
-  return (
+  const banditUI = (
     <div 
       ref={cardRef}
       id="breakpoint-bandit-extension"
@@ -408,12 +379,57 @@ function BreakpointBandit() {
       </Card>
     </div>
   );
+
+  if (isCollapsed) {
+    return (
+      <div 
+        className="fixed z-50"
+        style={{ top: `${position.y}px`, left: `${position.x}px` }}
+      >
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="default"
+                size="icon"
+                className="rounded-full h-14 w-14 shadow-2xl"
+                onClick={() => setIsCollapsed(false)}
+              >
+                <Camera className="h-7 w-7" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Show Breakpoint Bandit</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </div>
+    );
+  }
+
+  return (
+    <div className="h-screen w-screen bg-gray-300 flex flex-col items-center justify-center">
+        {banditUI}
+        <iframe 
+            ref={iframeRef}
+            src="/?content=true"
+            style={{ 
+                height: '100%', 
+                width: `${breakpoint}px`,
+                maxWidth: '100%',
+                transition: 'width 0.3s ease-in-out'
+            }}
+            className="border-8 border-gray-800 rounded-lg shadow-2xl bg-white"
+            title="Resizable Content"
+        />
+    </div>
+  );
 }
 
-export default function Home() {
+
+function PageContent() {
   return (
     <div className="relative bg-gray-50 text-gray-800 min-h-screen">
-      <BreakpointBandit />
       <header className="bg-white shadow-md sticky top-0 z-40">
         <nav className="container mx-auto px-6 py-3 flex justify-between items-center">
           <div className="flex items-center gap-2">
@@ -691,6 +707,13 @@ export default function Home() {
   );
 }
 
-    
+export default function Home() {
+  const searchParams = useSearchParams();
+  const isContentOnly = searchParams.get('content') === 'true';
 
-    
+  if (isContentOnly) {
+    return <PageContent />;
+  }
+
+  return <BreakpointBandit />;
+}
