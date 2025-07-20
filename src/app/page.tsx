@@ -10,8 +10,12 @@ import {
   CheckCircle,
   Loader2,
   ChevronsRightLeft,
-  Move
+  Move,
+  Code,
+  Brush,
+  Zap
 } from 'lucide-react';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -31,7 +35,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 
 type StorageOption = 'local' | 'drive';
 
-export default function Home() {
+function BreakpointBandit() {
   const [breakpoint, setBreakpoint] = useState('1440');
   const [storageOption, setStorageOption] = useState<StorageOption>('drive');
   const [isDriveConnected, setIsDriveConnected] = useState(false);
@@ -47,7 +51,6 @@ export default function Home() {
   const { toast } = useToast();
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-    // Prevent text selection while dragging
     e.preventDefault();
     setIsDragging(true);
     if (cardRef.current) {
@@ -88,16 +91,14 @@ export default function Home() {
   }, [isDragging, handleMouseMove, handleMouseUp]);
 
   useEffect(() => {
-    // Initialize position to top-right
-    const initialX = window.innerWidth - 400 - 16; // 400px card width, 16px padding
-    const initialY = 16; // 16px padding
+    const initialX = window.innerWidth - 400 - 16; 
+    const initialY = 16;
     setPosition({ x: initialX, y: initialY });
   }, []);
 
 
   const handleCapture = () => {
     setIsCapturing(true);
-    // Simulate capture process
     setTimeout(() => {
       setIsCapturing(false);
       toast({
@@ -109,7 +110,6 @@ export default function Home() {
 
   const handleConnectDrive = () => {
     setIsConnecting(true);
-    // Simulate OAuth flow
     setTimeout(() => {
       setIsConnecting(false);
       setIsDriveConnected(true);
@@ -144,7 +144,7 @@ export default function Home() {
   if (isCollapsed) {
     return (
       <div 
-        className="fixed"
+        className="fixed z-50"
         style={{ top: `${position.y}px`, left: `${position.x}px` }}
       >
         <TooltipProvider>
@@ -171,7 +171,7 @@ export default function Home() {
   return (
     <div 
       ref={cardRef}
-      className="w-full max-w-sm fixed"
+      className="w-full max-w-sm fixed z-50"
       style={{
         top: `${position.y}px`,
         left: `${position.x}px`,
@@ -281,3 +281,100 @@ export default function Home() {
     </div>
   );
 }
+
+export default function Home() {
+  return (
+    <div className="relative bg-gray-50 text-gray-800 min-h-screen">
+      <BreakpointBandit />
+      <header className="bg-white shadow-md sticky top-0 z-40">
+        <nav className="container mx-auto px-6 py-3 flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            <Zap className="text-primary h-6 w-6"/>
+            <h1 className="text-xl font-bold text-gray-800">QuantumLeap</h1>
+          </div>
+          <div className="hidden md:flex items-center space-x-6">
+            <a href="#" className="text-gray-600 hover:text-primary transition">Home</a>
+            <a href="#" className="text-gray-600 hover:text-primary transition">Features</a>
+            <a href="#" className="text-gray-600 hover:text-primary transition">Pricing</a>
+            <a href="#" className="text-gray-600 hover:text-primary transition">Contact</a>
+          </div>
+          <Button>Get Started</Button>
+        </nav>
+      </header>
+      
+      <main className="container mx-auto px-6 py-12">
+        <section className="text-center">
+          <h2 className="text-5xl font-extrabold text-gray-900 leading-tight">Build Tomorrow's Web, Today.</h2>
+          <p className="mt-4 text-xl text-gray-600 max-w-3xl mx-auto">
+            QuantumLeap provides the tools, resources, and community to help you build and scale your next great idea faster than ever before.
+          </p>
+          <div className="mt-8 flex justify-center gap-4">
+            <Button size="lg">Start Building</Button>
+            <Button size="lg" variant="outline">Learn More</Button>
+          </div>
+        </section>
+
+        <section className="mt-20">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
+            <div className="bg-white p-6 rounded-lg shadow-lg">
+              <Code className="h-10 w-10 text-primary mb-4" />
+              <h3 className="text-2xl font-bold text-gray-900">Developer Focused</h3>
+              <p className="mt-2 text-gray-600">Built for developers, by developers. Our platform integrates seamlessly with your existing workflow.</p>
+            </div>
+            <div className="bg-white p-6 rounded-lg shadow-lg">
+              <Brush className="h-10 w-10 text-primary mb-4" />
+              <h3 className="text-2xl font-bold text-gray-900">Stunning Design</h3>
+              <p className="mt-2 text-gray-600">Create beautiful, responsive user interfaces with our pre-built component library.</p>
+            </div>
+            <div className="bg-white p-6 rounded-lg shadow-lg">
+              <Zap className="h-10 w-10 text-primary mb-4" />
+              <h3 className="text-2xl font-bold text-gray-900">Blazing Fast</h3>
+              <p className="mt-2 text-gray-600">Experience unparalleled performance with our optimized, global edge network.</p>
+            </div>
+          </div>
+        </section>
+
+        <section className="mt-20 grid md:grid-cols-2 gap-12 items-center">
+          <div>
+            <h2 className="text-4xl font-bold text-gray-900">Accelerate Your Workflow</h2>
+            <p className="mt-4 text-gray-600">
+              Stop reinventing the wheel. QuantumLeap offers a robust set of features designed to get your project off the ground in record time. Focus on what matters: your code.
+            </p>
+            <ul className="mt-6 space-y-4">
+              <li className="flex items-start">
+                <CheckCircle className="h-6 w-6 text-green-500 mr-3 mt-1 flex-shrink-0" />
+                <span><strong className="font-semibold">Powerful APIs:</strong> Easily integrate with third-party services.</span>
+              </li>
+              <li className="flex items-start">
+                <CheckCircle className="h-6 w-6 text-green-500 mr-3 mt-1 flex-shrink-0" />
+                <span><strong className="font-semibold">Scalable Infrastructure:</strong> From side project to enterprise scale.</span>
+              </li>
+              <li className="flex items-start">
+                <CheckCircle className="h-6 w-6 text-green-500 mr-3 mt-1 flex-shrink-0" />
+                <span><strong className="font-semibold">24/7 Support:</strong> Our team is always here to help you succeed.</span>
+              </li>
+            </ul>
+          </div>
+          <div className="rounded-lg overflow-hidden shadow-2xl">
+            <Image 
+              src="https://placehold.co/600x400.png"
+              alt="Code editor"
+              data-ai-hint="code editor"
+              width={600}
+              height={400}
+              className="w-full h-auto object-cover"
+            />
+          </div>
+        </section>
+      </main>
+
+      <footer className="bg-white mt-20 border-t">
+        <div className="container mx-auto px-6 py-8 text-center text-gray-600">
+          <p>&copy; 2024 QuantumLeap. All rights reserved.</p>
+        </div>
+      </footer>
+    </div>
+  );
+}
+
+    
